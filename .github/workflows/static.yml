@@ -35,9 +35,9 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        with: /storage.archive.data.website
+        with:
           # Upload entire repository
-          path: '.'
+          path: '/storage.archive.data.website'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
