@@ -1,54 +1,63 @@
 <!DOCTYPE html>
+<!-- Terminal-style website for archiving images, with animations and boot sequence -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Archive Server</title>
     <style>
+        /* Global styles for the terminal-like interface */
         body {
-            background-color: #000;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
+            background-color: #000; /* Black background for terminal feel */
+            color: #00ff00; /* Green text like old terminals */
+            font-family: 'Courier New', monospace; /* Monospace font for code-like appearance */
             margin: 0;
             padding: 0;
         }
+        /* Terminal window that starts small and expands */
         .terminal {
-            border: 1px solid #00ff00;
+            border: 1px solid #00ff00; /* Green border */
             padding: 20px;
-            width: 0;
-            height: 0;
+            width: 0; /* Starts at 0 width */
+            height: 0; /* Starts at 0 height */
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* Centers the small box */
             box-sizing: border-box;
-            opacity: 0;
-            transition: all 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            animation: glow 1s infinite alternate;
+            opacity: 0; /* Starts invisible */
+            transition: all 2s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Smooth expansion with bounce */
+            animation: glow 1s infinite alternate; /* Pulsing glow effect */
             overflow: hidden;
         }
 
+        /* Keyframe for the glowing border */
         @keyframes glow {
             from { box-shadow: 0 0 5px #00ff00; }
-            to { box-shadow: 0 0 30px #00ff00, 0 0 40px #00ff00; }
+            to { box-shadow: 0 0 30px #00ff00, 0 0 40px #00ff00; } /* Increases glow intensity */
         }
+        /* Blinking cursor style */
         .cursor {
-            animation: blink 2s infinite;
+            animation: blink 2s infinite; /* Slow blink */
         }
+        /* Keyframe for cursor blink */
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
+        /* Prompt text styling */
         .prompt {
             color: #00ff00;
-            opacity: 0;
-            transition: opacity 0.5s;
+            opacity: 0; /* Starts hidden */
+            transition: opacity 0.5s; /* Fade in */
         }
+        /* Output text styling */
         .output {
             margin-left: 20px;
-            opacity: 0;
-            transition: opacity 0.5s;
+            opacity: 0; /* Starts hidden */
+            transition: opacity 0.5s; /* Fade in */
         }
+        /* Boot screen overlay */
         .boot {
             position: fixed;
             top: 0;
@@ -60,8 +69,9 @@
             font-family: 'Courier New', monospace;
             padding: 20px;
             box-sizing: border-box;
-            z-index: 10;
+            z-index: 10; /* Above terminal */
         }
+        /* Boot text preserves whitespace for formatting */
         .boot-text {
             white-space: pre;
         }
@@ -76,46 +86,50 @@
         <div class="output" data-text="Welcome to the Data Archive Server."></div>
     </div>
     <script>
+        // Function to simulate typing text character by character
         function typeWriter(element, text, speed = 30) {
             let i = 0;
             element.innerHTML = '';
             function type() {
                 if (i < text.length) {
                     if (text.charAt(i) === '\n') {
-                        element.innerHTML += '<br>';
+                        element.innerHTML += '<br>'; // Handle newlines
                     } else {
-                        element.innerHTML += text.charAt(i);
+                        element.innerHTML += text.charAt(i); // Add character
                     }
                     i++;
-                    setTimeout(type, speed);
+                    setTimeout(type, speed); // Continue typing
                 } else {
-                    // Add blinking cursor
+                    // Add blinking cursor after typing
                     element.innerHTML += '<span class="cursor">|</span>';
                 }
             }
             type();
         }
 
+        // Wait for DOM to load before starting
         document.addEventListener('DOMContentLoaded', function() {
-            // Fetch IP
+            // Fetch user's public IP address for the prompt
             fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
                     const ip = data.ip;
+                    // Replace placeholder in prompts with IP@archive
                     document.querySelectorAll('.prompt').forEach(prompt => {
                         prompt.textContent = prompt.textContent.replace('user@ip', `${ip}@archive`);
                     });
                 })
                 .catch(() => {
-                    // Fallback to localhost
+                    // If fetch fails, use localhost
                     document.querySelectorAll('.prompt').forEach(prompt => {
                         prompt.textContent = prompt.textContent.replace('user@ip', 'localhost@archive');
                     });
                 })
                 .finally(() => {
-                    startAnimations();
+                    startAnimations(); // Start the animation sequence
                 });
             
+            // Main animation function
             function startAnimations() {
                 const boot = document.querySelector('.boot');
                 const bootText = document.querySelector('.boot-text');
@@ -123,25 +137,24 @@
                 const prompts = document.querySelectorAll('.prompt');
                 const outputs = document.querySelectorAll('.output');
                 
-                // Start boot sequence
+                // Start boot sequence after a delay
                 setTimeout(() => {
-                    typeWriter(bootText, bootText.getAttribute('data-text'), 50);
+                    typeWriter(bootText, bootText.getAttribute('data-text'), 50); // Type boot messages
                     setTimeout(() => {
-                        // Hide boot
+                        // Hide boot screen
                         boot.style.display = 'none';
                         
-                        // Fade in the terminal
+                        // Start terminal expansion
                         setTimeout(() => {
                             terminal.style.opacity = '1';
                             terminal.style.width = '100vw';
                             terminal.style.height = '100vh';
                             terminal.style.top = '0';
                             terminal.style.left = '0';
-                            terminal.style.transform = 'none';
+                            terminal.style.transform = 'none'; // Expand to full screen
                             
-                            // Start sequence
+                            // Show prompt after expansion
                             setTimeout(() => {
-                                // Show prompt
                                 prompts[0].style.opacity = '1';
                                 setTimeout(() => {
                                     // Type output
@@ -150,7 +163,7 @@
                                 }, 500);
                             }, 1000);
                         }, 500);
-                    }, 5000); // Wait for boot to finish
+                    }, 8000); // Wait for boot typing to finish
                 }, 500);
             }
         });
