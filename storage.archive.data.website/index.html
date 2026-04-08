@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Archive Server</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+        }
+        .terminal {
+            border: 1px solid #00ff00;
+            padding: 20px;
+            width: 0;
+            height: 0;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-sizing: border-box;
+            opacity: 0;
+            transition: all 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation: glow 1s infinite alternate;
+            overflow: hidden;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px #00ff00; }
+            to { box-shadow: 0 0 30px #00ff00, 0 0 40px #00ff00; }
+        }
+        .cursor {
+            animation: blink 2s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .prompt {
+            color: #00ff00;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .output {
+            margin-left: 20px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .boot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        .boot-text {
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="boot">
+        <div class="boot-text" data-text="Data Archive Server&#10;Initializing system...&#10;Loading kernel modules...&#10;Mounting file systems...&#10;Starting network services...&#10;Boot complete.&#10;&#10;"></div>
+    </div>
+    <div class="terminal">
+        <div class="prompt">user@ip:~$ cat README.txt</div>
+        <div class="output" data-text="Welcome to the Data Archive Server."></div>
+    </div>
+    <script>
+        function typeWriter(element, text, speed = 30) {
+            let i = 0;
+            element.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    if (text.charAt(i) === '\n') {
+                        element.innerHTML += '<br>';
+                    } else {
+                        element.innerHTML += text.charAt(i);
+                    }
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // Add blinking cursor
+                    element.innerHTML += '<span class="cursor">|</span>';
+                }
+            }
+            type();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch IP
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const ip = data.ip;
+                    document.querySelectorAll('.prompt').forEach(prompt => {
+                        prompt.textContent = prompt.textContent.replace('user@ip', `${ip}@archive`);
+                    });
+                })
+                .catch(() => {
+                    // Fallback to localhost
+                    document.querySelectorAll('.prompt').forEach(prompt => {
+                        prompt.textContent = prompt.textContent.replace('user@ip', 'localhost@archive');
+                    });
+                })
+                .finally(() => {
+                    startAnimations();
+                });
+            
+            function startAnimations() {
+                const boot = document.querySelector('.boot');
+                const bootText = document.querySelector('.boot-text');
+                const terminal = document.querySelector('.terminal');
+                const prompts = document.querySelectorAll('.prompt');
+                const outputs = document.querySelectorAll('.output');
+                
+                // Start boot sequence
+                setTimeout(() => {
+                    typeWriter(bootText, bootText.getAttribute('data-text'), 50);
+                    setTimeout(() => {
+                        // Hide boot
+                        boot.style.display = 'none';
+                        
+                        // Fade in the terminal
+                        setTimeout(() => {
+                            terminal.style.opacity = '1';
+                            terminal.style.width = '100vw';
+                            terminal.style.height = '100vh';
+                            terminal.style.top = '0';
+                            terminal.style.left = '0';
+                            terminal.style.transform = 'none';
+                            
+                            // Start sequence
+                            setTimeout(() => {
+                                // Show prompt
+                                prompts[0].style.opacity = '1';
+                                setTimeout(() => {
+                                    // Type output
+                                    outputs[0].style.opacity = '1';
+                                    typeWriter(outputs[0], outputs[0].getAttribute('data-text'));
+                                }, 500);
+                            }, 1000);
+                        }, 500);
+                    }, 5000); // Wait for boot to finish
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
