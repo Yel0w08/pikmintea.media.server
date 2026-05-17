@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍵 tea.run</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&display=swap');
+  :root {
+    --yellow: #ffd900; --yellow-dim: #7a6500; --green: #39ff14;
+    --bg: #000; --bg2: #080808; --bg3: #0f0f0f;
+    --border: #1a1a1a; --text: #fff; --text-dim: #555;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px);
+  }
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 16px; border-bottom: 1px solid var(--border);
+    background: var(--bg2); flex-shrink: 0;
+  }
+  .header-title { font-size: 0.9rem; font-weight: 800; color: var(--yellow); text-shadow: 0 0 10px var(--yellow), 0 0 20px var(--yellow); letter-spacing: 0.1em; }
+  .header-stats { font-size: 0.7rem; color: var(--text-dim); }
+  .header-stats span { color: var(--green); }
+  .game { display: grid; grid-template-columns: 1fr 220px 260px; flex: 1; overflow: hidden; }
+  .panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .panel-title { font-size: 0.65rem; font-weight: 600; color: var(--text-dim); padding: 6px 12px; border-bottom: 1px solid var(--border); letter-spacing: 0.15em; background: var(--bg2); flex-shrink: 0; }
+  .panel-title .prompt { color: var(--green); margin-right: 6px; }
+  .brew-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 20px; position: relative; overflow: hidden; flex: 1; }
+  .tea-count { text-align: center; }
+  .tea-count .big { font-size: 2.2rem; font-weight: 800; color: var(--yellow); text-shadow: 0 0 20px rgba(255,217,0,0.5); display: block; line-height: 1; }
+  .tea-count .label { font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; }
+  .tea-count .per-sec { font-size: 0.75rem; color: var(--green); margin-top: 2px; }
+  .brew-btn {
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 2px solid var(--yellow);
+    background: radial-gradient(circle at 40% 35%, rgba(255,217,0,0.15), rgba(255,217,0,0.02));
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    transition: all 0.08s; position: relative;
+    box-shadow: 0 0 20px rgba(255,217,0,0.15), inset 0 0 20px rgba(255,217,0,0.05);
+    user-select: none;
+  }
+  .brew-btn:hover { box-shadow: 0 0 35px rgba(255,217,0,0.35), inset 0 0 20px rgba(255,217,0,0.1); border-color: #fff; }
+  .brew-btn:active { transform: scale(0.92); box-shadow: 0 0 50px rgba(255,217,0,0.6); }
+  .brew-btn .icon { font-size: 2.5rem; }
+  .brew-btn .btn-label { font-size: 0.6rem; font-weight: 700; color: var(--yellow); letter-spacing: 0.15em; }
+  .float-text { position: absolute; font-size: 0.8rem; font-weight: 700; color: var(--yellow); pointer-events: none; animation: floatup 0.9s ease forwards; text-shadow: 0 0 8px var(--yellow); }
+  @keyframes floatup { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-60px); } }
+  .milestone { font-size: 0.65rem; color: var(--text-dim); text-align: center; }
+  .milestone span { color: var(--yellow); }
+  .upgrades-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .upgrade-item { border: 1px solid var(--border); border-radius: 3px; padding: 8px 10px; cursor: pointer; transition: all 0.15s; background: var(--bg2); }
+  .upgrade-item:hover:not(.locked) { border-color: var(--yellow-dim); background: var(--bg3); }
+  .upgrade-item.locked { opacity: 0.35; cursor: not-allowed; }
+  .upgrade-name { font-size: 0.72rem; font-weight: 700; color: var(--yellow); display: flex; justify-content: space-between; }
+  .upgrade-name .count { font-size: 0.65rem; color: var(--green); font-weight: 400; }
+  .upgrade-desc { font-size: 0.6rem; color: var(--text-dim); margin-top: 3px; }
+  .upgrade-cost { font-size: 0.62rem; color: var(--yellow-dim); margin-top: 4px; }
+  .upgrade-cost.affordable { color: var(--green); }
+  .log-panel { border-right: none; }
+  .log-list { flex: 1; overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; font-size: 0.63rem; }
+  .log-entry { color: var(--text-dim); line-height: 1.5; animation: fadein 0.3s ease; }
+  .log-entry .ts { color: #333; margin-right: 6px; }
+  .log-entry .info { color: var(--green); }
+  .log-entry .warn { color: var(--yellow); }
+  .log-entry .good { color: #39ff14; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  .footer { border-top: 1px solid var(--border); padding: 4px 16px; font-size: 0.6rem; color: var(--text-dim); display: flex; justify-content: space-between; background: var(--bg2); flex-shrink: 0; }
+  .footer .brand { color: var(--yellow); }
+  .cursor { animation: blink 1s step-end infinite; color: var(--yellow); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="header-title">🍵 tea.run</span>
+  <span class="header-stats">v0.0.0-proto · <span id="tps-header">0.0</span> leaves/s</span>
+</div>
+<div class="game">
+  <div class="panel">
+    <div class="panel-title"><span class="prompt">$</span> brew.exe</div>
+    <div class="brew-panel" id="brew-panel">
+      <div class="tea-count">
+        <span class="big" id="leaf-count">0</span>
+        <div class="label">leaf</div>
+        <div class="per-sec" id="per-sec">+0.0 /sec</div>
+      </div>
+      <button class="brew-btn" id="brew-btn" onclick="brew()">
+        <span class="icon">🍃</span>
+        <span class="btn-label">BREW</span>
+      </button>
+      <div class="milestone" id="milestone">next: <span>10 🍃</span></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><span class="prompt">$</span> shop.exe</div>
+    <div class="upgrades-list" id="upgrades-list"></div>
+  </div>
+  <div class="panel log-panel">
+    <div class="panel-title"><span class="prompt">$</span> system.log</div>
+    <div class="log-list" id="log-list"></div>
+  </div>
+</div>
+<div class="footer">
+  <span>🍵 <span class="brand">pikmintea</span> · tea.run proto</span>
+  <span>total: <span id="total-brewed">0</span> 🍃 <span class="cursor">█</span></span>
+</div>
+<script>
+let leaves = 0, totalBrewed = 0, leavesPerClick = 1, leavesPerSec = 0;
+const upgrades = [
+  { id: 'teacup',  name: '🍵 Teacup',        desc: '+1 leaf/click',   baseCost: 10,    count: 0, clickBonus: 1,   secBonus: 0 },
+  { id: 'teapot',  name: '🫖 Teapot',         desc: '+0.5 leaves/sec', baseCost: 50,    count: 0, clickBonus: 0,   secBonus: 0.5 },
+  { id: 'garden',  name: '🌿 Tea Garden',     desc: '+2 leaves/sec',   baseCost: 250,   count: 0, clickBonus: 0,   secBonus: 2 },
+  { id: 'robot',   name: '🤖 Leaf Bot',       desc: '+5 leaves/sec',   baseCost: 1000,  count: 0, clickBonus: 0,   secBonus: 5 },
+  { id: 'factory', name: '🏭 Brew Factory',   desc: '+15 leaves/sec',  baseCost: 5000,  count: 0, clickBonus: 0,   secBonus: 15 },
+  { id: 'cloud',   name: '☁️ Cloud Farm',     desc: '+50 leaves/sec',  baseCost: 20000, count: 0, clickBonus: 0,   secBonus: 50 },
+  { id: 'quantum', name: '⚛️ Quantum Brewer', desc: '+200 leaves/sec', baseCost: 100000,count: 0, clickBonus: 0,   secBonus: 200 },
+];
+const milestones = [10,100,500,1000,5000,10000,50000,100000];
+function getCost(u) { return Math.floor(u.baseCost * Math.pow(1.15, u.count)); }
+function brew() {
+  leaves += leavesPerClick; totalBrewed += leavesPerClick;
+  const panel = document.getElementById('brew-panel');
+  const ft = document.createElement('div');
+  ft.className = 'float-text';
+  ft.textContent = '+' + fmt(leavesPerClick) + ' 🍃';
+  ft.style.left = (50 + (Math.random()-0.5)*30) + '%';
+  ft.style.top = '45%';
+  panel.appendChild(ft);
+  setTimeout(() => ft.remove(), 900);
+  update();
+}
+function buy(id) {
+  const u = upgrades.find(x => x.id === id);
+  const cost = getCost(u);
+  if (leaves < cost) return;
+  leaves -= cost; u.count++;
+  leavesPerClick += u.clickBonus; leavesPerSec += u.secBonus;
+  addLog(`<span class="warn">PURCHASED</span> ${u.name} (×${u.count})`);
+  update();
+}
+function fmt(n) {
+  if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
+  if (n >= 1e9)  return (n/1e9).toFixed(1)+'B';
+  if (n >= 1e6)  return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3)  return (n/1e3).toFixed(1)+'K';
+  return Math.floor(n).toString();
+}
+function addLog(msg) {
+  const list = document.getElementById('log-list');
+  const ts = new Date().toTimeString().slice(0,8);
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="ts">[${ts}]</span>${msg}`;
+  list.appendChild(div);
+  if (list.children.length > 80) list.removeChild(list.firstChild);
+  list.scrollTop = list.scrollHeight;
+}
+let lastMilestone = -1;
+function update() {
+  document.getElementById('leaf-count').textContent = fmt(leaves);
+  document.getElementById('per-sec').textContent = '+' + leavesPerSec.toFixed(1) + ' /sec';
+  document.getElementById('tps-header').textContent = leavesPerSec.toFixed(1);
+  document.getElementById('total-brewed').textContent = fmt(totalBrewed);
+  const next = milestones.find(m => m > totalBrewed);
+  const milEl = document.getElementById('milestone');
+  if (next) milEl.innerHTML = `next: <span>${fmt(next)} 🍃</span>`;
+  else milEl.innerHTML = `<span style="color:var(--green)">ALL DONE 🎉</span>`;
+  const reached = milestones.filter(m => m <= totalBrewed);
+  if (reached.length > lastMilestone) {
+    lastMilestone = reached.length;
+    if (reached.length > 0) addLog(`<span class="good">MILESTONE</span> ${fmt(reached[reached.length-1])} leaves! 🎉`);
+  }
+  renderUpgrades();
+}
+function renderUpgrades() {
+  const list = document.getElementById('upgrades-list');
+  list.innerHTML = '';
+  upgrades.forEach(u => {
+    const cost = getCost(u);
+    const canAfford = leaves >= cost;
+    const div = document.createElement('div');
+    div.className = 'upgrade-item' + (canAfford ? '' : ' locked');
+    div.innerHTML = `<div class="upgrade-name">${u.name}${u.count > 0 ? `<span class="count">×${u.count}</span>` : ''}</div><div class="upgrade-desc">${u.desc}</div><div class="upgrade-cost ${canAfford ? 'affordable' : ''}">🍃 ${fmt(cost)}</div>`;
+    if (canAfford) div.onclick = () => buy(u.id);
+    list.appendChild(div);
+  });
+}
+let lastTime = performance.now();
+function gameLoop(now) {
+  const dt = (now - lastTime) / 1000; lastTime = now;
+  if (leavesPerSec > 0) { leaves += leavesPerSec * dt; totalBrewed += leavesPerSec * dt; update(); }
+  requestAnimationFrame(gameLoop);
+}
+addLog('<span class="info">BOOT</span> tea.run v0.1.0-proto initialized');
+addLog('<span class="info">INFO</span> click the teapot to brew 🫖');
+addLog('<span class="info">INFO</span> pikmintea systems online ✅');
+renderUpgrades(); update(); requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
