@@ -1,0 +1,42 @@
+PIKMINTEA - RULES
+EFFECTIVE DATE: 03/06/2026
+
+VIBE "CODING"
+As of the beginning of 03/06/2026, "vibe coding" is strictly prohibited for all PikminTea applications.
+All development must follow structured, explicit, and reviewable engineering practices.
+
+AI USAGE RESTRICTION
+- Do NOT use any AI agent inside PikminTea repositories (including Tea.run and any related projects).
+- AI agents are strictly forbidden for development, automation, or code generation tasks within the project.
+- You are not allowed to train AI models or use them for any purpose other than advisory guidance.
+
+ALLOWED AI USAGE
+- It is still allowed to consult Large Language Models (LLMs) for guidance, explanations, or learning purposes.
+- AI may ONLY be used as an advisory tool, not as an active development agent.
+- you can use autocompletion tools IF you fully understand the code suggestions.
+
+CODE RULES
+- DO NOT send full source code from PikminTea repositories to any AI system, model, or external service.
+- Only minimal excerpts may be shared if strictly necessary for debugging or conceptual help.
+- Under no circumstances should complete modules, repositories, or production codebases be shared externally.
+
+SECURITY
+- Any violation of these rules may result in removal of repository access or project privileges and termination.
+- Security and intellectual property protection are top priorities.
+
+DEVELOPMENT :
+- electron is forbidden.
+
+OPEN SOURCE RULES :
+FOR OPEN SOURCE CONTRIBUTIONS, THE RULES ABOVE MUST BE FOLLOWED.
+IF THE PROJECT DOES NOT HAVE AN EXPLICIT LICENSE THE DEFAULT LICENSE IS MIT FOR ALL PIKMINTEA PROJECTS.
+YOU CANT USE ANY OF PIKMINTEA'S CODEBASE FOR COMMERCIAL PURPOSES.
+
+CLOSED SOURCE RULES :
+FOR CLOSED SOURCE CONTRIBUTIONS, THE RULES ABOVE MUST BE FOLLOWED.
+YOU MUST NOT SHARE ANY PIKMINTEA CODEBASE EXTERNALLY.
+YOU MUST NOT SHARE ANY PIKMINTEA OR YEL0W'S CODEBASE EXTERNALLY.
+
+COPYRIGHT NOTICE :
+IF THE PROJECT IS CLOSED SOURCE YOU CANNOT DISTRIBUTE IT OR USE IT FOR COMMERCIAL PURPOSES.
+THE ONLY ONE WHO CAN DISTRIBUTE A CLOSED SOURCE PIKMINTEA PROJECT IS THE OFFICIAL PIKMINTEA TEAM.
