@@ -1,0 +1,28 @@
+Pre linked cmake tamplates
+
+SFML: 
+https://github.com/meemknight/SFMLCma...
+
+Raylib:
+https://github.com/meemknight/raylibC...
+
+SDL2 (No Opengl):
+https://github.com/meemknight/SDL2Nog...
+
+SDL2 (For Opengl):
+https://github.com/meemknight/SDL2Ope...
+
+GLFW (For Opengl):
+https://github.com/meemknight/GLFWCMa...
+
+BGFX Cmake Setup
+https://github.com/meemknight/bgfxCma...
+
+My Personal Setup for Gamedev (GLFW + OpenGL + My library + input and stuff all setup):
+https://github.com/meemknight/cmakeSetup
+
+Code::Blocks GLFW (For OpenGL)
+https://github.com/meemknight/GLFWCod...
+
+Visual Studio Solution GLFW (For OpenGL)
+https://github.com/meemknight/GLFWVis...
